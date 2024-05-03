@@ -86,93 +86,52 @@ function createCounterWeight(obj, x, y, z) {
 function createLoadLine(obj, x, y, z) {
     'use strict'
 
-    geometry = new THREE.CylinderGeometry(0.01, 0.01, 15, 22);
-    geometry.rotateZ(Math.PI/2.5)
+    geometry = new THREE.CylinderGeometry(0.01, 0.01, Math.sqrt(2169), 4);
+    geometry.rotateZ(Math.acos(12/Math.sqrt(2169)));
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
     
-
 }
 
 function createCounterLoadLine(obj, x, y, z) {
+    'use strict'
+
+    geometry = new THREE.CylinderGeometry(0.01, 0.01, 20, 4);
+    geometry.rotateZ(-(Math.acos(12/20)));
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
     
 }
 
 function createTrolley(obj, x, y, z) {
+    'use strict'
+
+    geometry = new THREE.BoxGeometry(5, 3, 5);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
     
 }
 
 function createCable(obj, x, y, z) {
+    'use strict'
+
+    geometry = new THREE.CylinderGeometry(0.01, 0.01, 12, 4);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
     
 }
 
 function createHookblock(obj, x, y, z) {
-    
-}
-
-function createClawFingerTop(obj, x, y, z) {
-    
-}
-
-function createClawFingerBot(obj, x, y, z) {
-
-}
-
-function createClawSupport(obj, x, y, z) {
-
-}
-
-function createContainer(x, y, z) {
     'use strict'
 
-    var container = new THREE.Object3D();
-
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-
-    /*Bottom */
-    geometry = new THREE.BoxGeometry(7, 0.5, 7);
+    geometry = new THREE.BoxGeometry(2, 2, 2);
     mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y-3.5, z);
-    container.add(mesh);
-
-    /*Sides */
-    geometry = new THREE.BoxGeometry(7, 7, 0.5);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x-3.5, y, z);
-    container.add(mesh);
-
-    geometry = new THREE.BoxGeometry(7, 7, 0.5);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x+3.5, y, z);
-    container.add(mesh);
-
-    geometry = new THREE.BoxGeometry(0.5, 7, 7);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z-3.5);
-    container.add(mesh);
-
-    geometry = new THREE.BoxGeometry(0.5, 7, 7);
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z+3.5);
-    container.add(mesh);
-
-    
-}
-
-function createCargo(edge, x, y, z) {
-    'use strict'
-
-    var cargo = new THREE.Object3D();
-
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-    geometry = new THREE.BoxGeometry(edge, edge, edge);
-    mesh = new THREE.Mesh(geometry, material);
-
-    cargo.add(mesh);
-    cargo.position.set(x, y, z);
-
-    scene.add(cargo);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
     
 }
 
@@ -181,21 +140,64 @@ function createClaw(obj, x, y, z) {
 
     var claw = new THREE.Object3D();
 
+    material = new THREE.MeshBasicMaterial({ color: 0xff0000})
+    
+}
+
+function createContainer(x, y, z) {
+    'use strict'
+    
+    var container = new THREE.Object3D();
+    
     material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
     
-    createClawSupport(claw, 0, 0, 0);
-    createClawFingerTop(claw,);
-    createClawFingerBot(claw,);
-    createClawFingerTop(claw,);
-    createClawFingerBot(claw,);
-    createClawFingerTop(claw,);
-    createClawFingerBot(claw,);
-    createClawFingerTop(claw,);
-    createClawFingerBot(claw,);
+    /*Bottom */
+    geometry = new THREE.BoxGeometry(7, 0.5, 7);
+    var material1 = new THREE.MeshBasicMaterial({ color: 0x0000ff }); 
+    mesh = new THREE.Mesh(geometry, material1);
+    mesh.position.set(x, y-3.5, z);
+    container.add(mesh);
+    
+    /*Sides */
+    geometry = new THREE.BoxGeometry(7, 7, 0.5);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z-3.5);
+    container.add(mesh);
+    
+    geometry = new THREE.BoxGeometry(7, 7, 0.5);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z+3.5);
+    container.add(mesh);
+    
+    geometry = new THREE.BoxGeometry(0.5, 7, 7);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x-3.5, y, z);
+    container.add(mesh);
+    
+    geometry = new THREE.BoxGeometry(0.5, 7, 7);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x+3.5, y, z);
+    container.add(mesh);
 
-    scene.add(claw);
+    container.position.set(x, y, z);
+    
+    scene.add(container);
+}
 
-    claw.position.set(x, y, z);
+function createCargo(edge, x, y, z) {
+    'use strict'
+
+    var cargo = new THREE.Object3D();
+    
+    material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    geometry = new THREE.BoxGeometry(edge, edge, edge);
+    mesh = new THREE.Mesh(geometry, material);
+    
+    cargo.add(mesh);
+    cargo.position.set(x, y, z);
+    
+    scene.add(cargo);
+    
 }
 
 function createCrane(x, y, z) {
@@ -212,12 +214,13 @@ function createCrane(x, y, z) {
     createPeak(crane, 0, 85, 0);
     createJibandCounter(crane, 14, 76.5, 0);
     createCounterWeight(crane, -16, 71.5, 0);
-    //createLoadLine(crane, 6.8, 22.5, 0); //TODO after cameras
-    createCounterLoadLine(crane,); //TODO after cameras
-    createTrolley(crane,);
-    createCable(crane,);
-    createHookblock(crane,);
-    createClaw(crane,);
+    createLoadLine(crane, 22.5, 85, 0);
+    createCounterLoadLine(crane, -8, 85, 0);
+    createTrolley(crane, 47.5, 72.5, 0);
+    createCable(crane, 47.5, 65, 0.2);
+    createCable(crane, 47.5, 65, -0.5);
+    createHookblock(crane, 47.5, 58, 0);
+    createClaw(crane, );
 
     scene.add(crane)
     
@@ -236,12 +239,12 @@ function createScene(){
     scene.add(new THREE.AxesHelper(10))
 
     createCrane(0, 0, 0);
-    createContainer(10, 10, 10); //Ask Teacher
-    //createCargo(2, 20, 0.5, 0);
-    //createCargo(2.5, 0, 1, 20);
-    //createCargo(3, 40, 1.5, 0);
-    //createCargo(4, 0, 2, 40);
-    //createCargo(5, 25, 2.5, 25);
+    createContainer(40, 0, 0); //Ask Teacher
+    createCargo(2, 20, 0.5, 0);
+    createCargo(2.5, 0, 1, 20);
+    createCargo(3, 40, 1.5, 0);
+    createCargo(4, 0, 2, 40);
+    createCargo(5, 25, 2.5, 25);
 
 }
 
@@ -255,9 +258,9 @@ function createCamera(){
                                          window.innerWidth / window.innerHeight,
                                          1,
                                          1000);
-    camera.position.x = 90;
-    camera.position.y = 90;
-    camera.position.z = 90;
+    camera.position.x = 100;
+    camera.position.y = 100;
+    camera.position.z = 100;
     camera.lookAt(scene.position);
 }
 
