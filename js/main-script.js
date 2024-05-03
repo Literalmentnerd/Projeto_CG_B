@@ -13,6 +13,10 @@ var camera, scene, renderer;
 
 var geometry, material, mesh;
 
+////////////////////////
+/* CREATE OBJECT3D(S) */
+////////////////////////
+
 function createBase(obj, x, y, z) {
     'use strict'
 
@@ -129,6 +133,7 @@ function createHookblock(obj, x, y, z) {
     'use strict'
 
     geometry = new THREE.BoxGeometry(2, 2, 2);
+    material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -140,7 +145,67 @@ function createClaw(obj, x, y, z) {
 
     var claw = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({ color: 0xff0000})
+    material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+
+    //Top Claws
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ((5/18)*Math.PI);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x+2.9, y+1.29, z);
+    claw.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ((5/18)*Math.PI);
+    geometry.rotateY(Math.PI/2);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y+1.29, z-2.90);
+    claw.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ((5/18)*Math.PI);
+    geometry.rotateY(Math.PI);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x-2.9, y+1.29, z);
+    claw.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ((5/18)*Math.PI);
+    geometry.rotateY(-(Math.PI/2));
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y+1.29, z+2.9);
+    claw.add(mesh);
+
+    //Bottom Claws
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ(-(2/18)*Math.PI);
+    mesh = new THREE.Mesh(geometry,material),
+    mesh.position.set(x+3.12, y-1.88, z);
+    claw.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry.rotateY(Math.PI/2);
+    mesh = new THREE.Mesh(geometry,material),
+    mesh.position.set(x, y-1.88, z-3.12);
+    claw.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry.rotateY(Math.PI);
+    mesh = new THREE.Mesh(geometry,material),
+    mesh.position.set(x-3.12, y-1.88, z);
+    claw.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry.rotateY(-(Math.PI/2));
+    mesh = new THREE.Mesh(geometry,material),
+    mesh.position.set(x, y-1.88, z+3.12);
+    claw.add(mesh);
+
+    scene.add(claw);
+
+    obj.add(claw);
     
 }
 
@@ -220,7 +285,7 @@ function createCrane(x, y, z) {
     createCable(crane, 47.5, 65, 0.2);
     createCable(crane, 47.5, 65, -0.5);
     createHookblock(crane, 47.5, 58, 0);
-    createClaw(crane, );
+    createClaw(crane, 47.5, 54.84, 0);
 
     scene.add(crane)
     
@@ -233,13 +298,15 @@ function createCrane(x, y, z) {
 /////////////////////
 function createScene(){
     'use strict';
-
+    
     scene = new THREE.Scene();
+    
+    scene.background = new THREE.Color(0x7796a1);
 
     scene.add(new THREE.AxesHelper(10))
 
     createCrane(0, 0, 0);
-    createContainer(40, 0, 0); //Ask Teacher
+    createContainer(40, 0, 0);
     createCargo(2, 20, 0.5, 0);
     createCargo(2.5, 0, 1, 20);
     createCargo(3, 40, 1.5, 0);
@@ -258,9 +325,9 @@ function createCamera(){
                                          window.innerWidth / window.innerHeight,
                                          1,
                                          1000);
-    camera.position.x = 100;
-    camera.position.y = 100;
-    camera.position.z = 100;
+    camera.position.x = 70;
+    camera.position.y = 65;
+    camera.position.z = 0;
     camera.lookAt(scene.position);
 }
 
@@ -268,10 +335,6 @@ function createCamera(){
 /////////////////////
 /* CREATE LIGHT(S) */
 /////////////////////
-
-////////////////////////
-/* CREATE OBJECT3D(S) */
-////////////////////////
 
 //////////////////////
 /* CHECK COLLISIONS */
