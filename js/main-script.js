@@ -159,56 +159,56 @@ function createClaw(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ((5/18)*Math.PI);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x+2.9, y+1.29, z);
+    mesh.position.set(x+2.6119, y+1.5148, z);
     claw.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ((5/18)*Math.PI);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+1.29, z-2.90);
+    mesh.position.set(x, y+1.5148, z-2.6119);
     claw.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ((5/18)*Math.PI);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x-2.9, y+1.29, z);
+    mesh.position.set(x-2.6119, y+1.5148, z);
     claw.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ((5/18)*Math.PI);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+1.29, z+2.9);
+    mesh.position.set(x, y+1.5148, z+2.6119);
     claw.add(mesh);
 
     //Bottom Claws
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x+3.12, y-1.88, z);
+    mesh.position.set(x+3.8920, y-2.0181, z);
     claw.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x, y-1.88, z-3.12);
+    mesh.position.set(x, y-2.0181, z-3.8920);
     claw.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x-3.12, y-1.88, z);
+    mesh.position.set(x-3.8920, y-2.0181, z);
     claw.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x, y-1.88, z+3.12);
+    mesh.position.set(x, y-2.0181, z+3.8920);
     claw.add(mesh);
 
     scene.add(claw);
@@ -360,9 +360,6 @@ function createCamera(){
     cameras.push(clawCamera);
 
 }
-/////////////////////
-/* CREATE LIGHT(S) */
-/////////////////////
 
 //////////////////////
 /* CHECK COLLISIONS */
