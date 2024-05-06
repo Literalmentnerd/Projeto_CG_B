@@ -356,7 +356,7 @@ function createCamera(){
 
     let clawCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
     clawCamera.position.set(47.5, 54.84, 0);
-    clawCamera.lookAt(scene.position);
+    clawCamera.rotateX(-Math.PI/2);
     cameras.push(clawCamera);
 
 }
