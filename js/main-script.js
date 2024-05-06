@@ -101,7 +101,7 @@ function createCounterWeight(obj, x, y, z) {
 function createLoadLine(obj, x, y, z) {
     'use strict'
 
-    geometry = new THREE.CylinderGeometry(0.01, 0.01, Math.sqrt(2169), 4);
+    geometry = new THREE.CylinderGeometry(0.05, 0.05, Math.sqrt(2169), 4);
     geometry.rotateZ(Math.acos(12/Math.sqrt(2169)));
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z);
@@ -112,7 +112,7 @@ function createLoadLine(obj, x, y, z) {
 function createCounterLoadLine(obj, x, y, z) {
     'use strict'
 
-    geometry = new THREE.CylinderGeometry(0.01, 0.01, 20, 4);
+    geometry = new THREE.CylinderGeometry(0.05, 0.05, 20, 4);
     geometry.rotateZ(-(Math.acos(12/20)));
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z);
@@ -133,7 +133,7 @@ function createTrolley(obj, x, y, z) {
 function createCable(obj, x, y, z) {
     'use strict'
 
-    geometry = new THREE.CylinderGeometry(0.01, 0.01, 12, 4);
+    geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -339,22 +339,22 @@ function createCamera(){
     zCamera.lookAt(scene.position);
     cameras.push(zCamera);
 
-    let yCamera = new THREE.OrthographicCamera(window.innerWidth/-4, window.innerWidth/4, window.innerHeight/4, window.innerHeight/-4, 1, 1000);
+    let yCamera = new THREE.OrthographicCamera(window.innerWidth/-10, window.innerWidth/10, window.innerHeight/10, window.innerHeight/-10, 1, 1000);
     yCamera.position.set(0,100,0);
     yCamera.lookAt(scene.position);
     cameras.push(yCamera);
 
-    let ortogonalCamera = new THREE.OrthographicCamera(window.innerWidth/-4, window.innerWidth/4, window.innerHeight/4, window.innerHeight/-4, 1, 1000);
+    let ortogonalCamera = new THREE.OrthographicCamera(window.innerWidth/-10, window.innerWidth/10, window.innerHeight/10, window.innerHeight/-10, 1, 1000);
     ortogonalCamera.position.set(100,100,100);
     ortogonalCamera.lookAt(scene.position);
     cameras.push(ortogonalCamera);
 
-    let perspectiveCamera = new THREE.PerspectiveCamera(window.innerWidth/-4, window.innerWidth/4, window.innerHeight/4, window.innerHeight/-4, 1, 1000);
+    let perspectiveCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
     perspectiveCamera.position.set(100,100,100);
     perspectiveCamera.lookAt(scene.position);
     cameras.push(perspectiveCamera);
 
-    let clawCamera = new THREE.PerspectiveCamera(window.innerWidth/-4, window.innerWidth/4, window.innerHeight/4, window.innerHeight/-4, 1, 1000);
+    let clawCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
     clawCamera.position.set(47.5, 54.84, 0);
     clawCamera.lookAt(scene.position);
     cameras.push(clawCamera);
@@ -472,6 +472,7 @@ function onKeyDown(e) {
            }
            break;
         }
+    render();
 }
 
 ///////////////////////
