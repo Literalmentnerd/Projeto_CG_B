@@ -1,0 +1,4 @@
+/js/node_modules
+/.vite
+/js/package-lock.json
+/js/package.json

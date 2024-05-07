@@ -4,6 +4,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import * as Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MeshBasicMaterial } from 'three';
+import { randFloat } from 'three/src/math/MathUtils.js';
 
 //////////////////////
 /* GLOBAL VARIABLES */
@@ -301,6 +302,13 @@ function createCrane(x, y, z) {
 
 }
 
+function checkCargosCollision(cargo1, cargo2){
+    return  cargo1[1] + cargo1[0]/2 >= cargo2[1] - cargo2[0]/2 && //checking right side of temp with left of cargo
+            cargo1[1] - cargo1[0]/2 <= cargo2[1] + cargo2[0]/2 && //checking left side of temp with right of cargo
+            cargo1[2] + cargo1[0]/2 >= cargo2[2] - cargo2[0]/2 && //checking front side of temp with back of cargo
+            cargo1[2] - cargo1[0]/2 <= cargo2[2] + cargo2[0]/2; //checking back side of temp with front of cargo*/
+}
+
 /////////////////////
 /* CREATE SCENE(S) */
 /////////////////////
@@ -314,13 +322,20 @@ function createScene(){
     scene.add(new THREE.AxesHelper(10))
 
     createCrane(0, 0, 0);
-    createContainer(40, 0, 0);
-    createCargo(2, 20, 0, 0);
-    createCargo(2.5, 0, 0, 20);
-    createCargo(3, 40, 0, 0);
-    createCargo(4, 0, 0, 40);
-    createCargo(5, 25, 0, 25);
+    createContainer(23.75, 0, 0);
 
+    let cargos = [];
+    for(var i = 0; i < 5; i++) {
+        let temp = [randFloat(1, 5), randFloat(8.5, 40), randFloat(8.5, 40)]; //edge, x, z
+        for(var j = i-1; j >= 0; j--) {
+            if(checkCargosCollision(temp, cargos[j])) {
+                    temp = [randFloat(1, 5), randFloat(8.5, 20), randFloat(8.5, 20)]
+                    j = i;
+            }
+        }
+        cargos.push(temp);
+        createCargo(temp[0], temp[1], 0 + temp[0]/2 - 2, temp[2]);
+    }
 }
 
 //////////////////////
