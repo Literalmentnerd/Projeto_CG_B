@@ -428,13 +428,24 @@ function animate() {
 ////////////////////////////
 /* RESIZE WINDOW CALLBACK */
 ////////////////////////////
-function onResize() { 
+function onResize() { //work in progress not working correctly
     'use strict';
     renderer.setSize(window.innerWidth, window.innerHeight);
     if (window.innerHeight > 0 && window.innerWidth > 0) {
-        cameras[currentCam].aspect = window.innerWidth / window.innerHeight;
-        cameras[currentCam].updateProjectionMatrix();
+        for(var camera in cameras){
+            if(camera instanceof THREE.OrthographicCamera){
+                camera.left = -window.innerWidth/10;
+                camera.right = window.innerWidth/10;
+                camera.top = window.innerHeight/10;
+                camera.down = -window.innerHeight/10;
+            } else {
+                camera.aspect = window.innerWidth / window.innerHeight;
+            }
+            camera.updateProjectionMatrix();
+        }
     }
+
+    render();
 
 }
 
