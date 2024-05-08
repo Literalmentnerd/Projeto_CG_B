@@ -366,18 +366,19 @@ function createScene(){
     createCrane(0, 0, 0);
     createContainer(23.75, 0, 0);
 
-    let cargos = [];
+    let cargos = [[8,0,0]]; // Base is added to cargos list for collision check
     for(var i = 0; i < 5; i++) {
-        let temp = [randFloat(1, 5), randFloat(8.5, 40), randFloat(8.5, 40)]; //edge, x, z
+        let temp = [randFloat(1, 5), randFloat(-40, 40), randFloat(-40, 40)]; //edge, x, z
         for(var j = i-1; j >= 0; j--) {
             if(checkCargosCollision(temp, cargos[j])) {
-                    temp = [randFloat(1, 5), randFloat(8.5, 40), randFloat(8.5, 40)]
+                    temp = [randFloat(1, 5), randFloat(-40, 40), randFloat(-40, 40)]
                     j = i;
             }
         }
         cargos.push(temp);
         createCargo(temp[0], temp[1], 0 + temp[0]/2 - 2, temp[2]);
     }
+    cargos.splice(0, 1); // Base is removed from cargos list
 }
 
 //////////////////////
