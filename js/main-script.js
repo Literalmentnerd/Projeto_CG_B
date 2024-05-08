@@ -15,6 +15,10 @@ var currentCam = 1;
 
 var movement;
 
+var crane = new THREE.Object3D();
+var horizontal = new THREE.Object3D();
+var claw = new THREE.Object3D();
+
 var scene, renderer;
 
 var geometry, mesh;
@@ -225,11 +229,11 @@ function createFinger4 (obj, x, y, z) {
     obj.add(mesh);
     
 }
-var claw = new THREE.Object3D();
 
 function createClaw(obj, x, y, z) {
     'use strict'    
 
+    createHookblock(claw, 47.5, 58, 0);
     createFinger1(claw, x, y, z);
     createFinger2(claw, x, y, z);
     createFinger3(claw, x, y, z);
@@ -313,11 +317,12 @@ function randFloat(min, max) {
 function createHorizontalMov(obj) {
     'use strict'
 
-    createTrolley(obj, 47.5, 72.5, 0);
-    createCable(obj, 47.5, 65, 0.2);
-    createCable(obj, 47.5, 65, -0.5);
-    createHookblock(obj, 47.5, 58, 0);
-    createClaw(obj, 47.5, 54.84, 0);
+    createTrolley(horizontal, 47.5, 72.5, 0);
+    createCable(horizontal, 47.5, 65, 0.2);
+    createCable(horizontal, 47.5, 65, -0.5);
+    createClaw(horizontal, 47.5, 54.84, 0);
+
+    scene.add(horizontal);
 
 }
 
@@ -336,8 +341,6 @@ function createRotateCrane(obj) {
 
 function createCrane(x, y, z) {
     'use strict'
-
-    var crane = new THREE.Object3D();
 
     createBase(crane, 0, 0, 0);
     createTowerBot(crane, 0, 35.5, 0);
@@ -478,14 +481,14 @@ function animate() {
         //if (claw.position.y > 8.5 && claw.position.y < 85 && keysPressed.includes('e')) {
     if (keysPressed.includes('e')) {
             // Move the claw down
-            claw.position.y -= 0.2;
+            claw.position.y += 0.2;
             // Render the scene
             renderer.render(scene, cameras[currentCam]);
         } 
     //else if (claw.position.y > 4 && claw.position.y < 85 && keysPressed.includes('d') ) {
     else if (keysPressed.includes('d') ) {
     // Move the claw up
-        claw.position.y += 0.2;
+        claw.position.y -= 0.2;
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
     } 
