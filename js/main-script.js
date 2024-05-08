@@ -368,11 +368,11 @@ function createScene(){
 
     let cargos = [[8,0,0]]; // Base is added to cargos list for collision check
     for(var i = 0; i < 5; i++) {
-        let temp = [randFloat(1, 5), randFloat(-40, 40), randFloat(-40, 40)]; //edge, x, z
-        for(var j = i-1; j >= 0; j--) {
+        let temp = [randFloat(3, 5), randFloat(-40, 40), randFloat(-40, 40)]; //edge, x, z
+        for(var j = i; j >= 0; j--) {
             if(checkCargosCollision(temp, cargos[j])) {
-                    temp = [randFloat(1, 5), randFloat(-40, 40), randFloat(-40, 40)]
-                    j = i;
+                    temp = [randFloat(3, 5), randFloat(-40, 40), randFloat(-40, 40)]
+                    j = i+1;
             }
         }
         cargos.push(temp);
