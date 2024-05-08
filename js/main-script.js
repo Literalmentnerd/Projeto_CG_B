@@ -300,10 +300,11 @@ function createCargo(edge, x, y, z) {
 }
 
 function checkCargosCollision(cargo1, cargo2){
-    return  cargo1[1] + cargo1[0]/2 >= cargo2[1] - cargo2[0]/2 && //checking right side of temp with left of cargo
-            cargo1[1] - cargo1[0]/2 <= cargo2[1] + cargo2[0]/2 && //checking left side of temp with right of cargo
-            cargo1[2] + cargo1[0]/2 >= cargo2[2] - cargo2[0]/2 && //checking front side of temp with back of cargo
-            cargo1[2] - cargo1[0]/2 <= cargo2[2] + cargo2[0]/2; //checking back side of temp with front of cargo*/
+    // Check collision between two cargos with circular hitboxes
+    // Using the diagonal of the square as a radius
+    const distance = Math.sqrt((cargo1[1] - cargo2[1])**2 + (cargo1[2] - cargo2[2])**2);
+    const radiusSum = (Math.sqrt(cargo1[0]**2 + cargo1[0]**2) + Math.sqrt(cargo2[0]**2 + cargo2[0]**2))/2;
+    return distance < radiusSum;
 }
 
 function randFloat(min, max) {
@@ -370,7 +371,7 @@ function createScene(){
         let temp = [randFloat(1, 5), randFloat(8.5, 40), randFloat(8.5, 40)]; //edge, x, z
         for(var j = i-1; j >= 0; j--) {
             if(checkCargosCollision(temp, cargos[j])) {
-                    temp = [randFloat(1, 5), randFloat(8.5, 20), randFloat(8.5, 20)]
+                    temp = [randFloat(1, 5), randFloat(8.5, 40), randFloat(8.5, 40)]
                     j = i;
             }
         }
@@ -386,13 +387,13 @@ function createCamera(){
     'use strict';
 
     let xCamera = new THREE.OrthographicCamera(window.innerWidth/-10, window.innerWidth/10, window.innerHeight/10, window.innerHeight/-10, 1, 1000);
-    xCamera.position.set(100,0,0);
-    xCamera.lookAt(scene.position);
+    xCamera.position.set(100,30,0);
+    xCamera.lookAt(0,30,0);
     cameras.push(xCamera);
 
     let zCamera = new THREE.OrthographicCamera(window.innerWidth/-10, window.innerWidth/10, window.innerHeight/10, window.innerHeight/-10, 1, 1000);
-    zCamera.position.set(0,0,100);
-    zCamera.lookAt(scene.position);
+    zCamera.position.set(0,30,100);
+    zCamera.lookAt(0,30,0);
     cameras.push(zCamera);
 
     let yCamera = new THREE.OrthographicCamera(window.innerWidth/-10, window.innerWidth/10, window.innerHeight/10, window.innerHeight/-10, 1, 1000);
@@ -402,12 +403,12 @@ function createCamera(){
 
     let ortogonalCamera = new THREE.OrthographicCamera(window.innerWidth/-10, window.innerWidth/10, window.innerHeight/10, window.innerHeight/-10, 1, 1000);
     ortogonalCamera.position.set(100,100,100);
-    ortogonalCamera.lookAt(scene.position);
+    ortogonalCamera.lookAt(0,30,0);
     cameras.push(ortogonalCamera);
 
     let perspectiveCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
-    perspectiveCamera.position.set(100,100,100);
-    perspectiveCamera.lookAt(scene.position);
+    perspectiveCamera.position.set(75,85,75);
+    perspectiveCamera.lookAt(0,30,0);
     cameras.push(perspectiveCamera);
 
 }
@@ -417,7 +418,6 @@ function createCamera(){
 //////////////////////
 function checkCollisions(){
     'use strict';
-
 }
 
 ///////////////////////
