@@ -225,11 +225,10 @@ function createFinger4 (obj, x, y, z) {
     obj.add(mesh);
     
 }
+var claw = new THREE.Object3D();
 
 function createClaw(obj, x, y, z) {
-    'use strict'
-
-    var claw = new THREE.Object3D();
+    'use strict'    
 
     createFinger1(claw, x, y, z);
     createFinger2(claw, x, y, z);
@@ -472,9 +471,24 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
+    requestAnimationFrame(animate);
 
-    render();
-
+    // Check if the key E is pressed (ASCII code 69 or 101)
+        //check if position is bewtween the base and the top of the crane
+        //if (claw.position.y > 8.5 && claw.position.y < 85 && keysPressed.includes('e')) {
+    if (keysPressed.includes('e')) {
+            // Move the claw down
+            claw.position.y -= 0.2;
+            // Render the scene
+            renderer.render(scene, cameras[currentCam]);
+        } 
+    //else if (claw.position.y > 4 && claw.position.y < 85 && keysPressed.includes('d') ) {
+    else if (keysPressed.includes('d') ) {
+    // Move the claw up
+        claw.position.y += 0.2;
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    } 
 }
 
 ////////////////////////////
