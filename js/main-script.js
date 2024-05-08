@@ -4,7 +4,6 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import * as Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MeshBasicMaterial } from 'three';
-import { randFloat } from 'three/src/math/MathUtils.js';
 
 //////////////////////
 /* GLOBAL VARIABLES */
@@ -12,7 +11,9 @@ import { randFloat } from 'three/src/math/MathUtils.js';
 
 let cameras = [];
 
-var currentCam = 0;
+var currentCam = 1;
+
+var movement;
 
 var scene, renderer;
 
@@ -151,66 +152,94 @@ function createHookblock(obj, x, y, z) {
     
 }
 
-function createClaw(obj, x, y, z) {
+function createFinger1 (obj, x, y, z) {
     'use strict'
 
-    var claw = new THREE.Object3D();
-
-    //Top Claws
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ((5/18)*Math.PI);
     mesh = new THREE.Mesh(geometry, materials[2]);
     mesh.position.set(x+2.6119, y+1.5148, z);
-    claw.add(mesh);
+    obj.add(mesh);
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ(-(2/18)*Math.PI);
+    mesh = new THREE.Mesh(geometry,materials[2]),
+    mesh.position.set(x+3.8920, y-2.0181, z);
+    obj.add(mesh);
+
+}
+
+function createFinger2 (obj, x, y, z) {
+    'use strict'
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ((5/18)*Math.PI);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry, materials[2]);
     mesh.position.set(x, y+1.5148, z-2.6119);
-    claw.add(mesh);
-
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ((5/18)*Math.PI);
-    geometry.rotateY(Math.PI);
-    mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x-2.6119, y+1.5148, z);
-    claw.add(mesh);
-
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ((5/18)*Math.PI);
-    geometry.rotateY(-(Math.PI/2));
-    mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+1.5148, z+2.6119);
-    claw.add(mesh);
-
-    //Bottom Claws
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ(-(2/18)*Math.PI);
-    mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x+3.8920, y-2.0181, z);
-    claw.add(mesh);
+    obj.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry,materials[2]),
     mesh.position.set(x, y-2.0181, z-3.8920);
-    claw.add(mesh);
+    obj.add(mesh);
+    
+}
+
+function createFinger3 (obj, x, y, z) {
+    'use strict'
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ((5/18)*Math.PI);
+    geometry.rotateY(Math.PI);
+    mesh = new THREE.Mesh(geometry, materials[2]);
+    mesh.position.set(x-2.6119, y+1.5148, z);
+    obj.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry,materials[2]),
     mesh.position.set(x-3.8920, y-2.0181, z);
-    claw.add(mesh);
+    obj.add(mesh);
+    
+}
+
+function createFinger4 (obj, x, y, z) {
+    'use strict'
+
+    geometry = new THREE.BoxGeometry(1, 4, 1);
+    geometry.rotateZ((5/18)*Math.PI);
+    geometry.rotateY(-(Math.PI/2));
+    mesh = new THREE.Mesh(geometry, materials[2]);
+    mesh.position.set(x, y+1.5148, z+2.6119);
+    obj.add(mesh);
 
     geometry = new THREE.BoxGeometry(1, 4, 1);
     geometry.rotateZ(-(2/18)*Math.PI);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry,materials[2]),
     mesh.position.set(x, y-2.0181, z+3.8920);
-    claw.add(mesh);
+    obj.add(mesh);
+    
+}
+
+function createClaw(obj, x, y, z) {
+    'use strict'
+
+    var claw = new THREE.Object3D();
+
+    createFinger1(claw, x, y, z);
+    createFinger2(claw, x, y, z);
+    createFinger3(claw, x, y, z);
+    createFinger4(claw, x, y, z);
+
+    let clawCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
+    clawCamera.position.set(x, y, z);
+    clawCamera.rotateX(-Math.PI/2);
+    cameras.push(clawCamera);
 
     scene.add(claw);
 
@@ -270,6 +299,28 @@ function createCargo(edge, x, y, z) {
     
 }
 
+function checkCargosCollision(cargo1, cargo2){
+    return  cargo1[1] + cargo1[0]/2 >= cargo2[1] - cargo2[0]/2 && //checking right side of temp with left of cargo
+            cargo1[1] - cargo1[0]/2 <= cargo2[1] + cargo2[0]/2 && //checking left side of temp with right of cargo
+            cargo1[2] + cargo1[0]/2 >= cargo2[2] - cargo2[0]/2 && //checking front side of temp with back of cargo
+            cargo1[2] - cargo1[0]/2 <= cargo2[2] + cargo2[0]/2; //checking back side of temp with front of cargo*/
+}
+
+function randFloat(min, max) {
+    return Math.random() * (max-min) + min;
+}
+
+function createHorizontalMov(obj) {
+    'use strict'
+
+    createTrolley(obj, 47.5, 72.5, 0);
+    createCable(obj, 47.5, 65, 0.2);
+    createCable(obj, 47.5, 65, -0.5);
+    createHookblock(obj, 47.5, 58, 0);
+    createClaw(obj, 47.5, 54.84, 0);
+
+}
+
 function createRotateCrane(obj) {
     'use strict'
 
@@ -280,11 +331,7 @@ function createRotateCrane(obj) {
     createCounterWeight(obj, -16, 71.5, 0);
     createLoadLine(obj, 22.5, 85, 0);
     createCounterLoadLine(obj, -8, 85, 0);
-    createTrolley(obj, 47.5, 72.5, 0);
-    createCable(obj, 47.5, 65, 0.2);
-    createCable(obj, 47.5, 65, -0.5);
-    createHookblock(obj, 47.5, 58, 0);
-    createClaw(obj, 47.5, 54.84, 0);
+    createHorizontalMov(obj);
 }
 
 function createCrane(x, y, z) {
@@ -302,12 +349,6 @@ function createCrane(x, y, z) {
 
 }
 
-function checkCargosCollision(cargo1, cargo2){
-    return  cargo1[1] + cargo1[0]/2 >= cargo2[1] - cargo2[0]/2 && //checking right side of temp with left of cargo
-            cargo1[1] - cargo1[0]/2 <= cargo2[1] + cargo2[0]/2 && //checking left side of temp with right of cargo
-            cargo1[2] + cargo1[0]/2 >= cargo2[2] - cargo2[0]/2 && //checking front side of temp with back of cargo
-            cargo1[2] - cargo1[0]/2 <= cargo2[2] + cargo2[0]/2; //checking back side of temp with front of cargo*/
-}
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -368,11 +409,6 @@ function createCamera(){
     perspectiveCamera.position.set(100,100,100);
     perspectiveCamera.lookAt(scene.position);
     cameras.push(perspectiveCamera);
-
-    let clawCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
-    clawCamera.position.set(47.5, 54.84, 0);
-    clawCamera.rotateX(-Math.PI/2);
-    cameras.push(clawCamera);
 
 }
 
@@ -472,30 +508,101 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
         case 49: //1
-            currentCam = 0;
-            break;
-        case 50: //2
             currentCam = 1;
             break;
-        case 51: //3
+        case 50: //2
             currentCam = 2;
             break;
-        case 52: //4
+        case 51: //3
             currentCam = 3;
             break;
-        case 53: //5
+        case 52: //4
             currentCam = 4;
             break;
-        case 54: //6
+        case 53: //5
             currentCam = 5;
             break;
+        case 54: //6
+            currentCam = 0;
+            break;
         case 55: //7
-           for(var i = 0; i < materials.length; i++){
-            materials[i].wireframe = !materials[i].wireframe;
-           }
+            for(var i = 0; i < materials.length; i++){
+                materials[i].wireframe = !materials[i].wireframe;
+            }
            break;
+        case 65: //A
+        case 97: //a
+            movement = 2;
+        case 68: //D
+        case 100: //d
+            movement = 5;
+        case 69: //E
+        case 101: //e
+            movement = 6;
+        case 81: //Q
+        case 113: //q
+            movement = 1;
+        case 83: //S
+        case 115: //s
+            movement = 4;
+        case 87: //W
+        case 119: //w
+            movement = 3;
         }
     render();
+}
+
+////////////////////////////
+/* EVENT LISTENER FOR HUD */
+////////////////////////////
+var keysPressed = [];
+var curCam = "1";
+highlightKey(curCam);
+var meshActive = false;
+
+function isNumeric(str) {
+    if (typeof str != "string") return false
+    return !isNaN(str) && !isNaN(parseFloat(str))
+}
+
+document.addEventListener('keydown', function(event) {
+    var key = event.key;
+    if (!keysPressed.includes(key) && !isNumeric(key)) {
+        keysPressed.push(key);
+        highlightKey(key);
+    } else if(parseInt(key) >= 1 && parseInt(key) <= 6) {
+        unhighlightKey(curCam);
+        highlightKey(key);
+        curCam = key;
+    } else if(key == "7") {
+        meshActive = !meshActive;
+        if(meshActive) highlightKey(key);
+        else unhighlightKey(key);
+    }
+});
+
+document.addEventListener('keyup', function(event) {
+    var key = event.key;
+    if(!isNumeric(key)) {
+        keysPressed = keysPressed.filter(function(item) {
+            return item !== key;
+        });
+        unhighlightKey(key);
+    }
+});
+
+function highlightKey(key) {
+    var keyElement = document.getElementById('key-' + key.toLowerCase());
+    if (keyElement) {
+        keyElement.classList.add('active');
+    }
+}
+
+function unhighlightKey(key) {
+    var keyElement = document.getElementById('key-' + key.toLowerCase());
+    if (keyElement) {
+        keyElement.classList.remove('active');
+    }
 }
 
 ///////////////////////
