@@ -20,6 +20,7 @@ var horizontal = new THREE.Object3D();
 var claw = new THREE.Object3D();
 var cables = new THREE.Object3D();
 var trolley = new THREE.Object3D();
+var rotater = new THREE.Object3D();
 
 var scene, renderer;
 
@@ -334,19 +335,23 @@ function createHorizontalMov(obj) {
 
     scene.add(horizontal);
 
+    obj.add(horizontal);
+
 }
 
 function createRotateCrane(obj) {
     'use strict'
 
-    createTowerTop(obj, 0, 71.5, 0);
-    createCabin(obj, 0, 71.5, 3.5);
-    createPeak(obj, 0, 85, 0);
-    createJibandCounter(obj, 14, 76.5, 0);
-    createCounterWeight(obj, -16, 71.5, 0);
-    createLoadLine(obj, 22.5, 85, 0);
-    createCounterLoadLine(obj, -8, 85, 0);
-    createHorizontalMov(obj);
+    createTowerTop(rotater, 0, 71.5, 0);
+    createCabin(rotater, 0, 71.5, 3.5);
+    createPeak(rotater, 0, 85, 0);
+    createJibandCounter(rotater, 14, 76.5, 0);
+    createCounterWeight(rotater, -16, 71.5, 0);
+    createLoadLine(rotater, 22.5, 85, 0);
+    createCounterLoadLine(rotater, -8, 85, 0);
+    createHorizontalMov(rotater);
+
+    obj.add(rotater);
 }
 
 function createCrane(x, y, z) {
@@ -487,13 +492,13 @@ function animate() {
     requestAnimationFrame(animate);
 
     if (keysPressed.includes('e') && claw.position.y < 10) {
-        // Move the claw down
+        // Move the claw up
         claw.position.y += 0.5;
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
     } 
     else if (keysPressed.includes('d') && claw.position.y > -50) {
-        // Move the claw up
+        // Move the claw down
         claw.position.y -= 0.5;
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
@@ -515,11 +520,11 @@ function animate() {
         renderer.render(scene, cameras[currentCam]);
     }
     else if (keysPressed.includes('q')) {
-        horizontal.rotateY(Math.PI/180);
+        rotater.rotateY(Math.PI/180);
         renderer.render(scene, cameras[currentCam]);
     }
     else if (keysPressed.includes('a')) {
-        horizontal.rotateY(-Math.PI/180);
+        rotater.rotateY(-Math.PI/180);
         renderer.render(scene, cameras[currentCam]);
     }
 }
@@ -578,25 +583,7 @@ function onKeyDown(e) {
                 materials[i].wireframe = !materials[i].wireframe;
             }
            break;
-        case 65: //A
-        case 97: //a
-            movement = 2;
-        case 68: //D
-        case 100: //d
-            movement = 5;
-        case 69: //E
-        case 101: //e
-            movement = 6;
-        case 81: //Q
-        case 113: //q
-            movement = 1;
-        case 83: //S
-        case 115: //s
-            movement = 4;
-        case 87: //W
-        case 119: //w
-            movement = 3;
-        }
+    }
     render();
 }
 
