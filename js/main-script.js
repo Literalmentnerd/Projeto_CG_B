@@ -146,7 +146,7 @@ function createCables(obj, x, y, z) {
     geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z+0.2);
-    cables.add(mesh);
+    cables.add(mesh);  
 
     geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
     mesh = new THREE.Mesh(geometry, materials[3]);
@@ -244,7 +244,7 @@ function createFinger4 (obj, x, y, z) {
 function createClaw(obj, x, y, z) {
     'use strict'    
 
-    createHookblock(claw, 47.5, 58, 0);
+    createHookblock(claw, x, y + 3.16, z);
     createFinger1(claw, x, y, z);
     createFinger2(claw, x, y, z);
     createFinger3(claw, x, y, z);
@@ -452,6 +452,55 @@ function handleCollisions(){
 function update(){
     'use strict';
 
+    if (keysPressed.includes('e') && claw.position.y <= 11.5) { //scaling goes from 0 to 5.125
+        // Move the claw up
+        claw.position.y += 0.5;
+        cables.scale.y -= 0.04166;
+        cables.position.y += 2.9575;
+
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    } 
+    else if (keysPressed.includes('d') && claw.position.y >= -50) {
+        // Move the claw down
+        claw.position.y -= 0.5;
+        cables.scale.y += 0.04166;
+        cables.position.y -= 2.9575;
+
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    } 
+    if (keysPressed.includes('w') && trolley.position.x > -38) {
+        // Move the trolley inward
+        trolley.position.x -= 0.5;
+        cables.position.x -= 0.5;
+        claw.position.x -= 0.5;
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    }
+    else if (keysPressed.includes('s') && trolley.position.x < 0) {
+        // Move the trolley outward
+        trolley.position.x += 0.5;
+        cables.position.x += 0.5;
+        claw.position.x += 0.5;
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    }
+    if (keysPressed.includes('q')) {
+        rotater.rotateY(Math.PI/180);
+        renderer.render(scene, cameras[currentCam]);
+    }
+    else if (keysPressed.includes('a')) {
+        rotater.rotateY(-Math.PI/180);
+        renderer.render(scene, cameras[currentCam]);
+    }
+    if (keysPressed.includes('r')) {
+        //TODO
+    } 
+    else if (keysPressed.includes('f')) {
+        //TODO
+    }
+
 }
 
 /////////////
@@ -489,44 +538,12 @@ function init() {
 /////////////////////
 function animate() {
     'use strict';
-    requestAnimationFrame(animate);
+    
+    update();
+    
+    render();
 
-    if (keysPressed.includes('e') && claw.position.y < 10) {
-        // Move the claw up
-        claw.position.y += 0.5;
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    } 
-    else if (keysPressed.includes('d') && claw.position.y > -50) {
-        // Move the claw down
-        claw.position.y -= 0.5;
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    } 
-    else if (keysPressed.includes('w') && trolley.position.x > -38) {
-        // Move the trolley inward
-        trolley.position.x -= 0.5;
-        cables.position.x -= 0.5;
-        claw.position.x -= 0.5;
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    }
-    else if (keysPressed.includes('s') && trolley.position.x < 0) {
-        // Move the trolley outward
-        trolley.position.x += 0.5;
-        cables.position.x += 0.5;
-        claw.position.x += 0.5;
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    }
-    else if (keysPressed.includes('q')) {
-        rotater.rotateY(Math.PI/180);
-        renderer.render(scene, cameras[currentCam]);
-    }
-    else if (keysPressed.includes('a')) {
-        rotater.rotateY(-Math.PI/180);
-        renderer.render(scene, cameras[currentCam]);
-    }
+    requestAnimationFrame(animate);
 }
 
 ////////////////////////////
