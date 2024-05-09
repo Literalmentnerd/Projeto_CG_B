@@ -18,6 +18,8 @@ var movement;
 var crane = new THREE.Object3D();
 var horizontal = new THREE.Object3D();
 var claw = new THREE.Object3D();
+var cables = new THREE.Object3D();
+var trolley = new THREE.Object3D();
 
 var scene, renderer;
 
@@ -132,17 +134,25 @@ function createTrolley(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(5, 3, 5);
     mesh = new THREE.Mesh(geometry, materials[0]);
     mesh.position.set(x, y, z);
-    obj.add(mesh);
+    trolley.add(mesh);
+    obj.add(trolley);
     
 }
 
-function createCable(obj, x, y, z) {
+function createCables(obj, x, y, z) {
     'use strict'
 
     geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
     mesh = new THREE.Mesh(geometry, materials[3]);
-    mesh.position.set(x, y, z);
-    obj.add(mesh);
+    mesh.position.set(x, y, z+0.2);
+    cables.add(mesh);
+
+    geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
+    mesh = new THREE.Mesh(geometry, materials[3]);
+    mesh.position.set(x, y, z-0.2);
+    cables.add(mesh);
+
+    obj.add(cables);
     
 }
 
@@ -243,6 +253,7 @@ function createClaw(obj, x, y, z) {
     clawCamera.position.set(x, y, z);
     clawCamera.rotateX(-Math.PI/2);
     cameras.push(clawCamera);
+    claw.add(clawCamera);
 
     scene.add(claw);
 
@@ -318,9 +329,8 @@ function createHorizontalMov(obj) {
     'use strict'
 
     createTrolley(horizontal, 47.5, 72.5, 0);
-    createCable(horizontal, 47.5, 65, 0.2);
-    createCable(horizontal, 47.5, 65, -0.5);
     createClaw(horizontal, 47.5, 54.84, 0);
+    createCables(horizontal, 47.5, 65, 0);
 
     scene.add(horizontal);
 
@@ -476,22 +486,42 @@ function animate() {
     'use strict';
     requestAnimationFrame(animate);
 
-    // Check if the key E is pressed (ASCII code 69 or 101)
-        //check if position is bewtween the base and the top of the crane
-        //if (claw.position.y > 8.5 && claw.position.y < 85 && keysPressed.includes('e')) {
-    if (keysPressed.includes('e')) {
-            // Move the claw down
-            claw.position.y += 0.2;
-            // Render the scene
-            renderer.render(scene, cameras[currentCam]);
-        } 
-    //else if (claw.position.y > 4 && claw.position.y < 85 && keysPressed.includes('d') ) {
-    else if (keysPressed.includes('d') ) {
-    // Move the claw up
-        claw.position.y -= 0.2;
+    if (keysPressed.includes('e') && claw.position.y < 10) {
+        // Move the claw down
+        claw.position.y += 0.5;
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
     } 
+    else if (keysPressed.includes('d') && claw.position.y > -50) {
+        // Move the claw up
+        claw.position.y -= 0.5;
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    } 
+    else if (keysPressed.includes('w') && trolley.position.x > -38) {
+        // Move the trolley inward
+        trolley.position.x -= 0.5;
+        cables.position.x -= 0.5;
+        claw.position.x -= 0.5;
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    }
+    else if (keysPressed.includes('s') && trolley.position.x < 0) {
+        // Move the trolley outward
+        trolley.position.x += 0.5;
+        cables.position.x += 0.5;
+        claw.position.x += 0.5;
+        // Render the scene
+        renderer.render(scene, cameras[currentCam]);
+    }
+    else if (keysPressed.includes('q')) {
+        horizontal.rotateY(Math.PI/180);
+        renderer.render(scene, cameras[currentCam]);
+    }
+    else if (keysPressed.includes('a')) {
+        horizontal.rotateY(-Math.PI/180);
+        renderer.render(scene, cameras[currentCam]);
+    }
 }
 
 ////////////////////////////
