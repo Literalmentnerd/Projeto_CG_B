@@ -5,6 +5,79 @@ import * as Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MeshBasicMaterial } from 'three';
 
+///////////////
+/* CONSTANTS */
+///////////////
+
+// SIZES
+const BASE_WIDTH = 12;
+const BASE_HEIGHT = 4;
+const BASE_DEPTH = 12; 
+
+const TOWER_BOT_WIDTH = 5;
+const TOWER_BOT_HEIGHT = 67;
+const TOWER_BOT_DEPTH = 5;
+
+const TOWER_TOP_SIDE = 5;
+
+const CABIN_WIDTH = 5;
+const CABIN_HEIGHT = 5;
+const CABIN_DEPTH = 2;
+
+const PEAK_RADIUS = 3.3;
+const PEAK_HEIGHT = 12;
+
+const JIBAND_COUNTER_WIDTH = 72;
+const JIBAND_COUNTER_HEIGHT = 5;
+const JIBAND_COUNTER_DEPTH = 5;
+
+const COUNTER_WEIGHT_SIDE = 5;
+
+const LOAD_LINE_RADIUS = 0.05;
+const LOAD_LINE_HEIGHT1 = Math.sqrt(2169);
+const LOAD_LINE_HEIGHT2 = 20;
+
+const TROLLEY_WIDTH = 5;
+const TROLLEY_HEIGHT = 3;
+const TROLLEY_DEPTH = 5;
+
+const CABLE_RADIUS = 0.05;
+const CABLE_HEIGHT = 12;
+
+const HOOK_BLOCK_SIDE = 2;
+const HOOK_BLOCK_DELAY = 3.16;
+
+const FINGER_WIDTH = 1;
+const FINGER_HEIGHT = 4;
+const FINGER_DEPTH = 1;
+
+const TOP_FINGER_ANGLE = (5/18)*Math.PI;
+const TOP_FINGER_XZ_DELAY = 2.6119;
+const TOP_FINGER_Y_DELAY = 1.5148;
+
+const BOTTOM_FINGER_ANGLE = -(2/18)*Math.PI;
+const BOTTOM_FINGER_XZ_DELAY = 3.8920;
+const BOTTOM_FINGER_Y_DELAY = -2.0181;
+
+const CONTAINER_SIDE = 7;
+const CONTAINER_THICKNESS = 0.5;
+
+//MODEL POSITIONS
+const TROLLEY_POS = new THREE.Vector3(47.5, 72.5, 0);
+const CLAW_POS = new THREE.Vector3(47.5, 54.84, 0);
+const CABLES_POS = new THREE.Vector3(47.5, 65, 0);
+const TOWER_TOP_POS = new THREE.Vector3(0, 71.5, 0);
+const CABIN_POS = new THREE.Vector3(0, 71.5, 3.5);
+const PEAK_POS = new THREE.Vector3(0, 85, 0);
+const JIBAND_COUNTER_POS = new THREE.Vector3(14, 76.5, 0);
+const COUNTER_WEIGHT_POS = new THREE.Vector3(-16, 71.5, 0);
+const LOAD_LINE_POS = new THREE.Vector3(22.5, 85, 0);
+const COUNTER_LOAD_LINE_POS = new THREE.Vector3(-8, 85, 0);
+const BASE_POS = new THREE.Vector3(0, 0, 0);
+const TOWER_BOT_POS = new THREE.Vector3(0, 35.5, 0);
+const CRANE_POS = new THREE.Vector3(0, 0, 0);
+const CONTAINER_POS = new THREE.Vector3(23.75, 0, 0);
+
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
@@ -37,102 +110,132 @@ let materials = [new THREE.MeshBasicMaterial({ color: 0xbcbcbc }),
 /* CREATE OBJECT3D(S) */
 ////////////////////////
 
-function createBase(obj, x, y, z) {
+function createBase(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(12, 4 ,12);
+    geometry = new THREE.BoxGeometry(BASE_WIDTH, BASE_HEIGHT, BASE_DEPTH);
     mesh = new THREE.Mesh(geometry, materials[0]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 }
 
-function createTowerBot(obj, x, y, z) {
+function createTowerBot(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(5, 67 ,5);
+    geometry = new THREE.BoxGeometry(TOWER_BOT_WIDTH, TOWER_BOT_HEIGHT, TOWER_BOT_DEPTH);
     mesh = new THREE.Mesh(geometry, materials[1]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 }
 
-function createTowerTop(obj, x, y, z) {
+function createTowerTop(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(5, 5, 5);
+    geometry = new THREE.BoxGeometry(TOWER_TOP_SIDE, TOWER_TOP_SIDE, TOWER_TOP_SIDE);
     mesh = new THREE.Mesh(geometry, materials[1]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 }
 
-function createCabin(obj, x, y, z) {
+function createCabin(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(5, 5, 2);
+    geometry = new THREE.BoxGeometry(CABIN_WIDTH, CABIN_HEIGHT, CABIN_DEPTH);
     mesh = new THREE.Mesh(geometry, materials[2]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
     
 }
 
-function createPeak(obj, x, y, z) {
+function createPeak(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.ConeGeometry(3.3, 12, 4, 1, false, Math.PI/4); //base radius is prob wrong (first argument)
+    geometry = new THREE.ConeGeometry(PEAK_RADIUS, PEAK_HEIGHT, 4, 1, false, Math.PI/4);
     mesh = new THREE.Mesh(geometry, materials[1]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 }
 
-function createJibandCounter(obj, x, y, z) {
+function createJibandCounter(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(72, 5, 5);
+    geometry = new THREE.BoxGeometry(JIBAND_COUNTER_WIDTH, JIBAND_COUNTER_HEIGHT, JIBAND_COUNTER_DEPTH);
     mesh = new THREE.Mesh(geometry, materials[1]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 }
 
-function createCounterWeight(obj, x, y, z) {
+function createCounterWeight(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(5, 5, 5);
+    geometry = new THREE.BoxGeometry(COUNTER_WEIGHT_SIDE, COUNTER_WEIGHT_SIDE, COUNTER_WEIGHT_SIDE);
     mesh = new THREE.Mesh(geometry, materials[0]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 
 }
 
-function createLoadLine(obj, x, y, z) {
+function createLoadLine(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.CylinderGeometry(0.05, 0.05, Math.sqrt(2169), 4);
-    geometry.rotateZ(Math.acos(12/Math.sqrt(2169)));
+    geometry = new THREE.CylinderGeometry(LOAD_LINE_RADIUS, LOAD_LINE_RADIUS, LOAD_LINE_HEIGHT1, 4);
+    geometry.rotateZ(Math.acos(PEAK_HEIGHT/LOAD_LINE_HEIGHT1));
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
     
 }
 
-function createCounterLoadLine(obj, x, y, z) {
+function createCounterLoadLine(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.CylinderGeometry(0.05, 0.05, 20, 4);
-    geometry.rotateZ(-(Math.acos(12/20)));
+    geometry = new THREE.CylinderGeometry(LOAD_LINE_RADIUS, LOAD_LINE_RADIUS, LOAD_LINE_HEIGHT2, 4);
+    geometry.rotateZ(-(Math.acos(PEAK_HEIGHT/LOAD_LINE_HEIGHT2)));
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
     
 }
 
-function createTrolley(obj, x, y, z) {
+function createTrolley(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(5, 3, 5);
+    geometry = new THREE.BoxGeometry(TROLLEY_WIDTH, TROLLEY_HEIGHT, TROLLEY_DEPTH);
     mesh = new THREE.Mesh(geometry, materials[0]);
     mesh.position.set(x, y, z);
     trolley.add(mesh);
@@ -140,15 +243,18 @@ function createTrolley(obj, x, y, z) {
     
 }
 
-function createCables(obj, x, y, z) {
+function createCables(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
+    geometry = new THREE.CylinderGeometry(CABLE_RADIUS, CABLE_RADIUS, CABLE_HEIGHT, 4);
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z+0.2);
     cables.add(mesh);  
 
-    geometry = new THREE.CylinderGeometry(0.05, 0.05, 12, 4);
+    geometry = new THREE.CylinderGeometry(CABLE_RADIUS, CABLE_RADIUS, CABLE_HEIGHT, 4);
     mesh = new THREE.Mesh(geometry, materials[3]);
     mesh.position.set(x, y, z-0.2);
     cables.add(mesh);
@@ -157,98 +263,117 @@ function createCables(obj, x, y, z) {
     
 }
 
-function createHookblock(obj, x, y, z) {
+function createHookblock(obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(2, 2, 2);
+    geometry = new THREE.BoxGeometry(HOOK_BLOCK_SIDE, HOOK_BLOCK_SIDE, HOOK_BLOCK_SIDE);
     mesh = new THREE.Mesh(geometry, materials[4]);
     mesh.position.set(x, y, z);
     obj.add(mesh);
     
 }
 
-function createFinger1 (obj, x, y, z) {
+function createFinger1 (obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ((5/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(TOP_FINGER_ANGLE);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x+2.6119, y+1.5148, z);
+    mesh.position.set(x+TOP_FINGER_XZ_DELAY, y+TOP_FINGER_Y_DELAY, z);
     obj.add(mesh);
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x+3.8920, y-2.0181, z);
+    mesh.position.set(x+BOTTOM_FINGER_XZ_DELAY, y+BOTTOM_FINGER_Y_DELAY, z);
     obj.add(mesh);
 
 }
 
-function createFinger2 (obj, x, y, z) {
+function createFinger2 (obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ((5/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(TOP_FINGER_ANGLE);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+1.5148, z-2.6119);
+    mesh.position.set(x, y+TOP_FINGER_Y_DELAY, z-TOP_FINGER_XZ_DELAY);
     obj.add(mesh);
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x, y-2.0181, z-3.8920);
+    mesh.position.set(x, y+BOTTOM_FINGER_Y_DELAY, z-BOTTOM_FINGER_XZ_DELAY);
     obj.add(mesh);
     
 }
 
-function createFinger3 (obj, x, y, z) {
+function createFinger3 (obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ((5/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(TOP_FINGER_ANGLE);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x-2.6119, y+1.5148, z);
+    mesh.position.set(x-TOP_FINGER_XZ_DELAY, y+TOP_FINGER_Y_DELAY, z);
     obj.add(mesh);
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x-3.8920, y-2.0181, z);
+    mesh.position.set(x-BOTTOM_FINGER_XZ_DELAY, y+BOTTOM_FINGER_Y_DELAY, z);
     obj.add(mesh);
     
 }
 
-function createFinger4 (obj, x, y, z) {
+function createFinger4 (obj, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ((5/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(TOP_FINGER_ANGLE);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+1.5148, z+2.6119);
+    mesh.position.set(x, y+TOP_FINGER_Y_DELAY, z+TOP_FINGER_XZ_DELAY);
     obj.add(mesh);
 
-    geometry = new THREE.BoxGeometry(1, 4, 1);
-    geometry.rotateZ(-(2/18)*Math.PI);
+    geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
+    geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x, y-2.0181, z+3.8920);
+    mesh.position.set(x, y+BOTTOM_FINGER_Y_DELAY, z+BOTTOM_FINGER_XZ_DELAY);
     obj.add(mesh);
     
 }
 
-function createClaw(obj, x, y, z) {
+function createClaw(obj, pos) {
     'use strict'    
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
+    const hookBlockPos = new THREE.Vector3(x, y + HOOK_BLOCK_DELAY, z);
 
-    createHookblock(claw, x, y + 3.16, z);
-    createFinger1(claw, x, y, z);
-    createFinger2(claw, x, y, z);
-    createFinger3(claw, x, y, z);
-    createFinger4(claw, x, y, z);
+    createHookblock(claw, hookBlockPos);
+    createFinger1(claw, pos);
+    createFinger2(claw, pos);
+    createFinger3(claw, pos);
+    createFinger4(claw, pos);
 
     let clawCamera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 1, 1000);
     clawCamera.position.set(x, y, z);
@@ -262,36 +387,39 @@ function createClaw(obj, x, y, z) {
     
 }
 
-function createContainer(x, y, z) {
+function createContainer(pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
     
     var container = new THREE.Object3D();
     
     /*Bottom */
-    geometry = new THREE.BoxGeometry(7, 0.5, 7);
+    geometry = new THREE.BoxGeometry(CONTAINER_SIDE, 0.5, CONTAINER_SIDE);
     mesh = new THREE.Mesh(geometry, materials[4]);
     mesh.position.set(x, y-2, z);
     container.add(mesh);
     
     /*Sides */
-    geometry = new THREE.BoxGeometry(7, 7, 0.5);
+    geometry = new THREE.BoxGeometry(CONTAINER_SIDE, CONTAINER_SIDE, CONTAINER_THICKNESS);
     mesh = new THREE.Mesh(geometry, materials[5]);
-    mesh.position.set(x, y+1.5, z-3.5);
+    mesh.position.set(x, y+1.5, z-CONTAINER_SIDE/2);
     container.add(mesh);
     
-    geometry = new THREE.BoxGeometry(7, 7, 0.5);
+    geometry = new THREE.BoxGeometry(CONTAINER_SIDE, CONTAINER_SIDE, CONTAINER_THICKNESS);
     mesh = new THREE.Mesh(geometry, materials[5]);
-    mesh.position.set(x, y+1.5, z+3.5);
+    mesh.position.set(x, y+1.5, z+CONTAINER_SIDE/2);
     container.add(mesh);
     
-    geometry = new THREE.BoxGeometry(0.5, 7, 7);
+    geometry = new THREE.BoxGeometry(CONTAINER_THICKNESS, CONTAINER_SIDE, CONTAINER_SIDE);
     mesh = new THREE.Mesh(geometry, materials[5]);
-    mesh.position.set(x-3.5, y+1.5, z);
+    mesh.position.set(x-CONTAINER_SIDE/2, y+1.5, z);
     container.add(mesh);
     
-    geometry = new THREE.BoxGeometry(0.5, 7, 7);
+    geometry = new THREE.BoxGeometry(CONTAINER_THICKNESS, CONTAINER_SIDE, CONTAINER_SIDE);
     mesh = new THREE.Mesh(geometry, materials[5]);
-    mesh.position.set(x+3.5, y+1.5, z);
+    mesh.position.set(x+CONTAINER_SIDE/2, y+1.5, z);
     container.add(mesh);
 
     container.position.set(x, y, z);
@@ -299,8 +427,11 @@ function createContainer(x, y, z) {
     scene.add(container);
 }
 
-function createCargo(edge, x, y, z) {
+function createCargo(edge, pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
     var cargo = new THREE.Object3D();
     
@@ -329,9 +460,9 @@ function randFloat(min, max) {
 function createHorizontalMov(obj) {
     'use strict'
 
-    createTrolley(horizontal, 47.5, 72.5, 0);
-    createClaw(horizontal, 47.5, 54.84, 0);
-    createCables(horizontal, 47.5, 65, 0);
+    createTrolley(horizontal, TROLLEY_POS);
+    createClaw(horizontal, CLAW_POS);
+    createCables(horizontal, CABLES_POS);
 
     scene.add(horizontal);
 
@@ -342,23 +473,26 @@ function createHorizontalMov(obj) {
 function createRotateCrane(obj) {
     'use strict'
 
-    createTowerTop(rotater, 0, 71.5, 0);
-    createCabin(rotater, 0, 71.5, 3.5);
-    createPeak(rotater, 0, 85, 0);
-    createJibandCounter(rotater, 14, 76.5, 0);
-    createCounterWeight(rotater, -16, 71.5, 0);
-    createLoadLine(rotater, 22.5, 85, 0);
-    createCounterLoadLine(rotater, -8, 85, 0);
+    createTowerTop(rotater, TOWER_TOP_POS);
+    createCabin(rotater, CABIN_POS);
+    createPeak(rotater, PEAK_POS);
+    createJibandCounter(rotater, JIBAND_COUNTER_POS);
+    createCounterWeight(rotater, COUNTER_WEIGHT_POS);
+    createLoadLine(rotater, LOAD_LINE_POS);
+    createCounterLoadLine(rotater, COUNTER_LOAD_LINE_POS);
     createHorizontalMov(rotater);
 
     obj.add(rotater);
 }
 
-function createCrane(x, y, z) {
+function createCrane(pos) {
     'use strict'
+    const x = pos.x;
+    const y = pos.y;
+    const z = pos.z;
 
-    createBase(crane, 0, 0, 0);
-    createTowerBot(crane, 0, 35.5, 0);
+    createBase(crane, BASE_POS);
+    createTowerBot(crane, TOWER_BOT_POS);
     createRotateCrane(crane);
 
     scene.add(crane)
@@ -380,8 +514,8 @@ function createScene(){
 
     scene.add(new THREE.AxesHelper(10))
 
-    createCrane(0, 0, 0);
-    createContainer(23.75, 0, 0);
+    createCrane(CRANE_POS);
+    createContainer(CONTAINER_POS);
 
     let cargos = [[8,0,0]]; // Base is added to cargos list for collision check
     for(var i = 0; i < 5; i++) {
@@ -393,7 +527,8 @@ function createScene(){
             }
         }
         cargos.push(temp);
-        createCargo(temp[0], temp[1], 0 + temp[0]/2 - 2, temp[2]);
+
+        createCargo(temp[0], new THREE.Vector3(temp[1], 0 + temp[0]/2 - 2, temp[2]));
     }
     cargos.splice(0, 1); // Base is removed from cargos list
 }
