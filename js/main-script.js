@@ -86,8 +86,6 @@ let cameras = [];
 
 var currentCam = 1;
 
-var movement;
-
 var crane = new THREE.Object3D();
 var horizontal = new THREE.Object3D();
 var claw = new THREE.Object3D();
@@ -98,6 +96,11 @@ var rotater = new THREE.Object3D();
 var scene, renderer;
 
 var geometry, mesh;
+
+var clock = new THREE.Clock();
+
+var clawPivots = []
+var clawRotation = 0;
 
 let materials = [new THREE.MeshBasicMaterial({ color: 0xbcbcbc }),
     new THREE.MeshBasicMaterial({ color: 0xffd03f }),
@@ -282,17 +285,24 @@ function createFinger1 (obj, pos) {
     const y = pos.y;
     const z = pos.z;
 
+    var finger = new THREE.Mesh();
+    finger.position.set(x+HOOK_BLOCK_SIDE/2, y+TOP_FINGER_Y_DELAY*2, z);
+
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(TOP_FINGER_ANGLE);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x+TOP_FINGER_XZ_DELAY, y+TOP_FINGER_Y_DELAY, z);
-    obj.add(mesh);
+    mesh.position.set(TOP_FINGER_XZ_DELAY-HOOK_BLOCK_SIDE/2, TOP_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, 0);
+    finger.add(mesh);
 
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x+BOTTOM_FINGER_XZ_DELAY, y+BOTTOM_FINGER_Y_DELAY, z);
-    obj.add(mesh);
+    mesh.position.set(BOTTOM_FINGER_XZ_DELAY-HOOK_BLOCK_SIDE/2, BOTTOM_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, 0);
+    finger.add(mesh);
+
+    clawPivots.push(finger);
+
+    obj.add(finger);
 
 }
 
@@ -302,19 +312,26 @@ function createFinger2 (obj, pos) {
     const y = pos.y;
     const z = pos.z;
 
+    var finger = new THREE.Mesh();
+    finger.position.set(x, y+TOP_FINGER_Y_DELAY*2, z-HOOK_BLOCK_SIDE/2);
+
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(TOP_FINGER_ANGLE);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+TOP_FINGER_Y_DELAY, z-TOP_FINGER_XZ_DELAY);
-    obj.add(mesh);
+    mesh.position.set(0, TOP_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, -TOP_FINGER_XZ_DELAY+HOOK_BLOCK_SIDE/2);
+    finger.add(mesh);
 
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     geometry.rotateY(Math.PI/2);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x, y+BOTTOM_FINGER_Y_DELAY, z-BOTTOM_FINGER_XZ_DELAY);
-    obj.add(mesh);
+    mesh.position.set(0, BOTTOM_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, -BOTTOM_FINGER_XZ_DELAY+HOOK_BLOCK_SIDE/2);
+    finger.add(mesh);
+
+    clawPivots.push(finger);
+
+    obj.add(finger);
     
 }
 
@@ -324,19 +341,26 @@ function createFinger3 (obj, pos) {
     const y = pos.y;
     const z = pos.z;
 
+    var finger = new THREE.Mesh();
+    finger.position.set(x-HOOK_BLOCK_SIDE/2, y+TOP_FINGER_Y_DELAY*2, z);
+
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(TOP_FINGER_ANGLE);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x-TOP_FINGER_XZ_DELAY, y+TOP_FINGER_Y_DELAY, z);
-    obj.add(mesh);
+    mesh.position.set(-TOP_FINGER_XZ_DELAY+HOOK_BLOCK_SIDE/2, TOP_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, 0);
+    finger.add(mesh);
 
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     geometry.rotateY(Math.PI);
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x-BOTTOM_FINGER_XZ_DELAY, y+BOTTOM_FINGER_Y_DELAY, z);
-    obj.add(mesh);
+    mesh.position.set(-BOTTOM_FINGER_XZ_DELAY+HOOK_BLOCK_SIDE/2, BOTTOM_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, 0);
+    finger.add(mesh);
+
+    clawPivots.push(finger);
+
+    obj.add(finger);
     
 }
 
@@ -346,19 +370,26 @@ function createFinger4 (obj, pos) {
     const y = pos.y;
     const z = pos.z;
 
+    var finger = new THREE.Mesh();
+    finger.position.set(x, y+TOP_FINGER_Y_DELAY*2, z+HOOK_BLOCK_SIDE/2);
+
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(TOP_FINGER_ANGLE);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry, materials[2]);
-    mesh.position.set(x, y+TOP_FINGER_Y_DELAY, z+TOP_FINGER_XZ_DELAY);
-    obj.add(mesh);
+    mesh.position.set(0, TOP_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, TOP_FINGER_XZ_DELAY-HOOK_BLOCK_SIDE/2);
+    finger.add(mesh);
 
     geometry = new THREE.BoxGeometry(FINGER_WIDTH, FINGER_HEIGHT, FINGER_DEPTH);
     geometry.rotateZ(BOTTOM_FINGER_ANGLE);
     geometry.rotateY(-(Math.PI/2));
     mesh = new THREE.Mesh(geometry,materials[2]),
-    mesh.position.set(x, y+BOTTOM_FINGER_Y_DELAY, z+BOTTOM_FINGER_XZ_DELAY);
-    obj.add(mesh);
+    mesh.position.set(0, BOTTOM_FINGER_Y_DELAY-TOP_FINGER_Y_DELAY*2, BOTTOM_FINGER_XZ_DELAY-HOOK_BLOCK_SIDE/2);
+    finger.add(mesh);
+
+    clawPivots.push(finger);
+
+    obj.add(finger);
     
 }
 
@@ -584,13 +615,21 @@ function handleCollisions(){
 ////////////
 /* UPDATE */
 ////////////
-function update(){
+function translate(obj, pos){ 
+    obj.translateX(pos.x);
+    obj.translateY(pos.y);
+    obj.translateZ(pos.z);
+}
+
+function update(delta){
     'use strict';
+
+    const velocity = 0.5;
 
     if (keysPressed.includes('e') && claw.position.y <= 11.5) { //scaling goes from 0 to 5.125
         // Move the claw up
-        claw.position.y += 0.5;
-        cables.scale.y -= 0.04166;
+        claw.position.y += velocity;
+        cables.scale.y -= velocity/CABLE_HEIGHT;
         cables.position.y += 2.9575;
 
         // Render the scene
@@ -598,29 +637,31 @@ function update(){
     } 
     else if (keysPressed.includes('d') && claw.position.y >= -50) {
         // Move the claw down
-        claw.position.y -= 0.5;
-        cables.scale.y += 0.04166;
+        claw.position.y -= velocity;
+        cables.scale.y += velocity/CABLE_HEIGHT;
         cables.position.y -= 2.9575;
 
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
     } 
+
     if (keysPressed.includes('w') && trolley.position.x > -38) {
         // Move the trolley inward
-        trolley.position.x -= 0.5;
-        cables.position.x -= 0.5;
-        claw.position.x -= 0.5;
+        trolley.position.x -= velocity;
+        cables.position.x -= velocity;
+        claw.position.x -= velocity;
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
     }
     else if (keysPressed.includes('s') && trolley.position.x < 0) {
         // Move the trolley outward
-        trolley.position.x += 0.5;
-        cables.position.x += 0.5;
-        claw.position.x += 0.5;
+        trolley.position.x += velocity;
+        cables.position.x += velocity;
+        claw.position.x += velocity;
         // Render the scene
         renderer.render(scene, cameras[currentCam]);
     }
+
     if (keysPressed.includes('q')) {
         rotater.rotateY(Math.PI/180);
         renderer.render(scene, cameras[currentCam]);
@@ -629,11 +670,20 @@ function update(){
         rotater.rotateY(-Math.PI/180);
         renderer.render(scene, cameras[currentCam]);
     }
-    if (keysPressed.includes('r')) {
-        //TODO
+
+    if (keysPressed.includes('r') && clawRotation < 45) {
+        clawRotation += 1;
+        clawPivots[0].rotateZ(Math.PI/180);
+        clawPivots[1].rotateX(Math.PI/180);
+        clawPivots[2].rotateZ(-Math.PI/180);
+        clawPivots[3].rotateX(-Math.PI/180);
     } 
-    else if (keysPressed.includes('f')) {
-        //TODO
+    else if (keysPressed.includes('f') && clawRotation > -17.5) {
+        clawRotation -= 1;
+        clawPivots[0].rotateZ(-Math.PI/180);
+        clawPivots[1].rotateX(-Math.PI/180);
+        clawPivots[2].rotateZ(Math.PI/180);
+        clawPivots[3].rotateX(Math.PI/180);
     }
 
 }
@@ -674,9 +724,11 @@ function init() {
 function animate() {
     'use strict';
     
-    update();
+    update(clock.getDelta());
     
     render();
+
+    clock.getDelta();
 
     requestAnimationFrame(animate);
 }
