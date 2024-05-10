@@ -92,12 +92,15 @@ var claw = new THREE.Object3D();
 var cables = new THREE.Object3D();
 var trolley = new THREE.Object3D();
 var rotater = new THREE.Object3D();
+var hookBlock;
 
 var scene, renderer;
 
 var geometry, mesh;
 
 var clock = new THREE.Clock();
+
+var cargos = [];
 
 var clawPivots = []
 var clawRotation = 0;
@@ -273,9 +276,9 @@ function createHookblock(obj, pos) {
     const z = pos.z;
 
     geometry = new THREE.BoxGeometry(HOOK_BLOCK_SIDE, HOOK_BLOCK_SIDE, HOOK_BLOCK_SIDE);
-    mesh = new THREE.Mesh(geometry, materials[4]);
-    mesh.position.set(x, y, z);
-    obj.add(mesh);
+    hookBlock = new THREE.Object3D().add(new THREE.Mesh(geometry, materials[4]));
+    hookBlock.position.set(x, y, z);
+    obj.add(hookBlock);
     
 }
 
@@ -458,15 +461,32 @@ function createContainer(pos) {
     scene.add(container);
 }
 
-function createCargo(edge, pos) {
+function createCargo(edge, pos, shape) {
     'use strict'
     const x = pos.x;
     const y = pos.y;
     const z = pos.z;
 
+    switch(shape) {
+        case 1: //cube
+            geometry = new THREE.BoxGeometry(edge, edge, edge);
+            break;
+        case 2: //dodecahedron
+            geometry = new THREE.DodecahedronGeometry(Math.sqrt(edge**2 + edge**2)/2);
+            break;
+        case 3: //icosahedron
+            geometry = new THREE.IcosahedronGeometry(Math.sqrt(edge**2 + edge**2)/2);
+            break;
+        case 4: //torus
+            geometry = new THREE.TorusGeometry(Math.sqrt(edge**2 + edge**2)/2);
+            break;
+        case 5: //torus knot
+            geometry = new THREE.TorusKnotGeometry(Math.sqrt(edge**2 + edge**2)/2);
+            break;
+    }
+
     var cargo = new THREE.Object3D();
-    
-    geometry = new THREE.BoxGeometry(edge, edge, edge);
+
     mesh = new THREE.Mesh(geometry, materials[5]);
     
     cargo.add(mesh);
@@ -476,11 +496,11 @@ function createCargo(edge, pos) {
     
 }
 
-function checkCargosCollision(cargo1, cargo2){
+function checkCargosCollision(radius1, pos1, radius2, pos2){
     // Check collision between two cargos with circular hitboxes
     // Using the diagonal of the square as a radius
-    const distance = Math.sqrt((cargo1[1] - cargo2[1])**2 + (cargo1[2] - cargo2[2])**2);
-    const radiusSum = (Math.sqrt(cargo1[0]**2 + cargo1[0]**2) + Math.sqrt(cargo2[0]**2 + cargo2[0]**2))/2;
+    const distance = Math.sqrt((pos1.x - pos2.x)**2 + (pos1.z - pos2.z)**2);
+    const radiusSum = (Math.sqrt(radius1**2 + radius1**2) + Math.sqrt(radius2**2 + radius2**2))/2;
     return distance < radiusSum;
 }
 
@@ -548,18 +568,22 @@ function createScene(){
     createCrane(CRANE_POS);
     createContainer(CONTAINER_POS);
 
-    let cargos = [[8,0,0]]; // Base is added to cargos list for collision check
+    cargos.push([Math.sqrt(BASE_WIDTH**2 + BASE_DEPTH**2), BASE_POS]); // Base is added to cargos list for collision check
     for(var i = 0; i < 5; i++) {
-        let temp = [randFloat(3, 5), randFloat(-40, 40), randFloat(-40, 40)]; //edge, x, z
+        let radius = randFloat(3, 5);
+        let temp = new THREE.Vector3(randFloat(-20, 20), 0, randFloat(-20, 20));
+        temp.y = radius/2 - 2;
         for(var j = i; j >= 0; j--) {
-            if(checkCargosCollision(temp, cargos[j])) {
-                    temp = [randFloat(3, 5), randFloat(-40, 40), randFloat(-40, 40)]
-                    j = i+1;
+            if(checkCargosCollision(radius, temp, cargos[j][0], cargos[j][1])) {
+                radius = randFloat(3, 5);
+                temp.x = randFloat(-20, 20);
+                temp.y = radius/2 - 2;
+                temp.z = randFloat(-20, 20);
+                j = i+1;
             }
         }
-        cargos.push(temp);
-
-        createCargo(temp[0], new THREE.Vector3(temp[1], 0 + temp[0]/2 - 2, temp[2]));
+        cargos.push([radius, temp]);
+        createCargo(radius, temp, (i%5)+1);
     }
     cargos.splice(0, 1); // Base is removed from cargos list
 }
@@ -600,8 +624,13 @@ function createCamera(){
 //////////////////////
 /* CHECK COLLISIONS */
 //////////////////////
-function checkCollisions(){
+function checkCollisions(radius1, pos1, radius2, pos2){
     'use strict';
+    
+    // Check collision based off of position and radius of spheres
+    const distance = Math.sqrt((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2 + (pos1.z - pos2.z)**2);
+    const radiusSum = radius1 + radius2;
+    return distance < radiusSum;
 }
 
 ///////////////////////
@@ -610,6 +639,17 @@ function checkCollisions(){
 function handleCollisions(){
     'use strict';
 
+    var curClaw = new THREE.Vector3();
+    hookBlock.getWorldPosition(curClaw);
+    curClaw.y -= HOOK_BLOCK_DELAY;
+
+    // Check collision between crane and cargos
+    for(var i = 0; i < cargos.length; i++){
+        if(checkCollisions(-(BOTTOM_FINGER_Y_DELAY), curClaw, Math.sqrt(cargos[i][0]**2 + cargos[i][0]**2), cargos[i][1])){
+            console.log("Collision detected with cargo " + i);
+            //TODO Animation
+        }
+    }
 }
 
 ////////////
@@ -686,6 +726,7 @@ function update(delta){
         clawPivots[3].rotateX(Math.PI/180);
     }
 
+    handleCollisions();
 }
 
 /////////////
