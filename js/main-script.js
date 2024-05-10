@@ -98,6 +98,11 @@ var scene, renderer;
 
 var geometry, mesh;
 
+var animation = false;
+var collision_with;
+
+var rotater_angle = 0;
+
 var clock = new THREE.Clock();
 
 var cargos = [];
@@ -468,19 +473,19 @@ function createCargo(edge, pos, shape) {
     const z = pos.z;
 
     switch(shape) {
-        case 1: //cube
+        case 0: //cube
             geometry = new THREE.BoxGeometry(edge, edge, edge);
             break;
-        case 2: //dodecahedron
+        case 1: //dodecahedron
             geometry = new THREE.DodecahedronGeometry(Math.sqrt(edge**2 + edge**2)/2);
             break;
-        case 3: //icosahedron
+        case 2: //icosahedron
             geometry = new THREE.IcosahedronGeometry(Math.sqrt(edge**2 + edge**2)/2);
             break;
-        case 4: //torus
+        case 3: //torus
             geometry = new THREE.TorusGeometry(Math.sqrt(edge**2 + edge**2)/2);
             break;
-        case 5: //torus knot
+        case 4: //torus knot
             geometry = new THREE.TorusKnotGeometry(Math.sqrt(edge**2 + edge**2)/2);
             break;
     }
@@ -491,6 +496,8 @@ function createCargo(edge, pos, shape) {
     
     cargo.add(mesh);
     cargo.position.set(x, y, z);
+
+    cargos.push([edge, cargo]);
     
     scene.add(cargo);
     
@@ -568,24 +575,29 @@ function createScene(){
     createCrane(CRANE_POS);
     createContainer(CONTAINER_POS);
 
-    cargos.push([Math.sqrt(BASE_WIDTH**2 + BASE_DEPTH**2), BASE_POS]); // Base is added to cargos list for collision check
     for(var i = 0; i < 5; i++) {
         let radius = randFloat(3, 5);
         let temp = new THREE.Vector3(randFloat(-20, 20), 0, randFloat(-20, 20));
         temp.y = radius/2 - 2;
-        for(var j = i; j >= 0; j--) {
-            if(checkCargosCollision(radius, temp, cargos[j][0], cargos[j][1])) {
+
+        while(checkCargosCollision(radius, temp, Math.sqrt(BASE_WIDTH**2 + BASE_DEPTH**2), BASE_POS)) { // Check collision with base
+            radius = randFloat(3, 5);
+            temp.x = randFloat(-20, 20);
+            temp.y = radius/2 - 2;
+            temp.z = randFloat(-20, 20);
+        }
+
+        for(var j = i-1; j >= 0; j--) {
+            if(checkCargosCollision(radius, temp, cargos[j][0], cargos[j][1].position)) { // Check collision with other cargos
                 radius = randFloat(3, 5);
                 temp.x = randFloat(-20, 20);
                 temp.y = radius/2 - 2;
                 temp.z = randFloat(-20, 20);
-                j = i+1;
+                j = i;
             }
         }
-        cargos.push([radius, temp]);
-        createCargo(radius, temp, (i%5)+1);
+        createCargo(radius, temp, (i%5));
     }
-    cargos.splice(0, 1); // Base is removed from cargos list
 }
 
 //////////////////////
@@ -645,9 +657,19 @@ function handleCollisions(){
 
     // Check collision between crane and cargos
     for(var i = 0; i < cargos.length; i++){
-        if(checkCollisions(-(BOTTOM_FINGER_Y_DELAY), curClaw, Math.sqrt(cargos[i][0]**2 + cargos[i][0]**2), cargos[i][1])){
+        if(checkCollisions(-(BOTTOM_FINGER_Y_DELAY), curClaw, Math.sqrt(cargos[i][0]**2 + cargos[i][0]**2), cargos[i][1].position)){
             console.log("Collision detected with cargo " + i);
-            //TODO Animation
+            animation = true;
+            collision_with = i;
+
+            openingClaw = true;
+            closingClaw = true;
+            pullingUp = true;
+            rotating = true;
+            movingTrolley = true;
+            pullingDown = true;
+            reopen = true;
+            defaultpos = true;
         }
     }
 }
@@ -661,72 +683,172 @@ function translate(obj, pos){
     obj.translateZ(pos.z);
 }
 
+var openingClaw;
+var closingClaw;
+var pullingUp;
+var rotating;
+var movingTrolley;
+var pullingDown;
+var reopen;
+var defaultpos;
+
 function update(delta){
     'use strict';
 
     const velocity = 0.5;
 
-    if (keysPressed.includes('e') && claw.position.y <= 11.5) { //scaling goes from 0 to 5.125
-        // Move the claw up
-        claw.position.y += velocity;
-        cables.scale.y -= velocity/CABLE_HEIGHT;
-        cables.position.y += 2.9575;
+    if(animation){
+        //open claw
+        if(clawRotation < 30 && openingClaw) {
+            clawRotation += 1;
+            clawPivots[0].rotateZ(Math.PI/180);
+            clawPivots[1].rotateX(Math.PI/180);
+            clawPivots[2].rotateZ(-Math.PI/180);
+            clawPivots[3].rotateX(-Math.PI/180);
+            return;
+        }
+        openingClaw = false;
 
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    } 
-    else if (keysPressed.includes('d') && claw.position.y >= -50) {
-        // Move the claw down
-        claw.position.y -= velocity;
-        cables.scale.y += velocity/CABLE_HEIGHT;
-        cables.position.y -= 2.9575;
+        var moveTo = new THREE.Vector3();
+        hookBlock.getWorldPosition(moveTo);
+        moveTo.y -= HOOK_BLOCK_DELAY*2;
+        cargos[collision_with][1].position.set(moveTo.x, moveTo.y, moveTo.z);
+        //close claw
+        if(clawRotation > -10 && closingClaw) {
+            clawRotation -= 1;
+            clawPivots[0].rotateZ(-Math.PI/180);
+            clawPivots[1].rotateX(-Math.PI/180);
+            clawPivots[2].rotateZ(Math.PI/180);
+            clawPivots[3].rotateX(Math.PI/180);
+            return;
+        }
+        closingClaw = false;
 
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    } 
+        if(claw.position.y < 0 && pullingUp) {
+            // Move the claw up
+            claw.position.y += velocity;
+            cables.scale.y -= velocity/CABLE_HEIGHT;
+            cables.position.y += 2.9575;
+            return;
+        }
+        pullingUp = false;
 
-    if (keysPressed.includes('w') && trolley.position.x > -38) {
-        // Move the trolley inward
-        trolley.position.x -= velocity;
-        cables.position.x -= velocity;
-        claw.position.x -= velocity;
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
+        if(rotater_angle < 0 && rotating){
+            rotater_angle += 1;
+            rotater.rotateY(Math.PI/180);
+            return;
+        } else if(rotater_angle > 0 && rotating){
+            rotater_angle -= 1;
+            rotater.rotateY(-Math.PI/180);
+            return;
+        }
+        rotating = false;
+
+        if(trolley.position.x < 0 && movingTrolley){
+            trolley.position.x += velocity;
+            cables.position.x += velocity;
+            claw.position.x += velocity;
+            return;
+        }
+        movingTrolley = false;
+
+        if(claw.position.y > -50 && pullingDown) {
+            // Move the claw down
+            claw.position.y -= velocity;
+            cables.scale.y += velocity/CABLE_HEIGHT;
+            cables.position.y -= 2.9575;
+            return;
+        }
+        pullingDown = false;
+
+        if(clawRotation < 20 && reopen) {
+            clawRotation += 1;
+            clawPivots[0].rotateZ(Math.PI/180);
+            clawPivots[1].rotateX(Math.PI/180);
+            clawPivots[2].rotateZ(-Math.PI/180);
+            clawPivots[3].rotateX(-Math.PI/180);
+            return;
+        }
+        reopen = false;
+
+        cargos[collision_with][1].visible = false;
+
+        if(claw.position.y < 0 && defaultpos) {
+            claw.position.y += velocity;
+            cables.scale.y -= velocity/CABLE_HEIGHT;
+            cables.position.y += 2.9575;
+            return;
+        }
+
+        animation = false;
+        cargos.splice(collision_with,1);
     }
-    else if (keysPressed.includes('s') && trolley.position.x < 0) {
-        // Move the trolley outward
-        trolley.position.x += velocity;
-        cables.position.x += velocity;
-        claw.position.x += velocity;
-        // Render the scene
-        renderer.render(scene, cameras[currentCam]);
-    }
+    else {
 
-    if (keysPressed.includes('q')) {
-        rotater.rotateY(Math.PI/180);
-        renderer.render(scene, cameras[currentCam]);
-    }
-    else if (keysPressed.includes('a')) {
-        rotater.rotateY(-Math.PI/180);
-        renderer.render(scene, cameras[currentCam]);
-    }
+        if (keysPressed.includes('e') && claw.position.y <= 11.5) { //scaling goes from 0 to 5.125
+            // Move the claw up
+            claw.position.y += velocity;
+            cables.scale.y -= velocity/CABLE_HEIGHT;
+            cables.position.y += 2.9575;
 
-    if (keysPressed.includes('r') && clawRotation < 45) {
-        clawRotation += 1;
-        clawPivots[0].rotateZ(Math.PI/180);
-        clawPivots[1].rotateX(Math.PI/180);
-        clawPivots[2].rotateZ(-Math.PI/180);
-        clawPivots[3].rotateX(-Math.PI/180);
-    } 
-    else if (keysPressed.includes('f') && clawRotation > -17.5) {
-        clawRotation -= 1;
-        clawPivots[0].rotateZ(-Math.PI/180);
-        clawPivots[1].rotateX(-Math.PI/180);
-        clawPivots[2].rotateZ(Math.PI/180);
-        clawPivots[3].rotateX(Math.PI/180);
-    }
+            // Render the scene
+            renderer.render(scene, cameras[currentCam]);
+        } 
+        else if (keysPressed.includes('d') && claw.position.y >= -50) {
+            // Move the claw down
+            claw.position.y -= velocity;
+            cables.scale.y += velocity/CABLE_HEIGHT;
+            cables.position.y -= 2.9575;
 
-    handleCollisions();
+            // Render the scene
+            renderer.render(scene, cameras[currentCam]);
+        } 
+
+        if (keysPressed.includes('w') && trolley.position.x > -38) {
+            // Move the trolley inward
+            trolley.position.x -= velocity;
+            cables.position.x -= velocity;
+            claw.position.x -= velocity;
+            // Render the scene
+            renderer.render(scene, cameras[currentCam]);
+        }
+        else if (keysPressed.includes('s') && trolley.position.x < 0) {
+            // Move the trolley outward
+            trolley.position.x += velocity;
+            cables.position.x += velocity;
+            claw.position.x += velocity;
+            // Render the scene
+            renderer.render(scene, cameras[currentCam]);
+        }
+
+        if (keysPressed.includes('q')) {
+            rotater_angle += 1;
+            rotater.rotateY(Math.PI/180);
+            renderer.render(scene, cameras[currentCam]);
+        }
+        else if (keysPressed.includes('a')) {
+            rotater_angle -= 1;
+            rotater.rotateY(-Math.PI/180);
+            renderer.render(scene, cameras[currentCam]);
+        }
+
+        if (keysPressed.includes('r') && clawRotation < 45) {
+            clawRotation += 1;
+            clawPivots[0].rotateZ(Math.PI/180);
+            clawPivots[1].rotateX(Math.PI/180);
+            clawPivots[2].rotateZ(-Math.PI/180);
+            clawPivots[3].rotateX(-Math.PI/180);
+        } 
+        else if (keysPressed.includes('f') && clawRotation > -17.5) {
+            clawRotation -= 1;
+            clawPivots[0].rotateZ(-Math.PI/180);
+            clawPivots[1].rotateX(-Math.PI/180);
+            clawPivots[2].rotateZ(Math.PI/180);
+            clawPivots[3].rotateX(Math.PI/180);
+        }
+
+        handleCollisions();
+    }
 }
 
 /////////////
