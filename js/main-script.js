@@ -575,24 +575,32 @@ function createScene(){
     createCrane(CRANE_POS);
     createContainer(CONTAINER_POS);
 
-    for(var i = 0; i < 5; i++) {
+    for(var i = 0; i < 10; i++) {
         let radius = randFloat(3, 5);
-        let temp = new THREE.Vector3(randFloat(-20, 20), 0, randFloat(-20, 20));
+        let temp = new THREE.Vector3(randFloat(-40, 40), 0, randFloat(-40, 40));
         temp.y = radius/2 - 2;
 
-        while(checkCargosCollision(radius, temp, Math.sqrt(BASE_WIDTH**2 + BASE_DEPTH**2), BASE_POS)) { // Check collision with base
+        while(checkCargosCollision(radius, temp, BASE_WIDTH, BASE_POS)) { // Check collision with base
             radius = randFloat(3, 5);
-            temp.x = randFloat(-20, 20);
-            temp.y = radius/2 - 2;
-            temp.z = randFloat(-20, 20);
+            temp.x = randFloat(-40, 40);
+            temp.y = radius/2 - BASE_HEIGHT/2;
+            temp.z = randFloat(-40, 40);
         }
 
         for(var j = i-1; j >= 0; j--) {
             if(checkCargosCollision(radius, temp, cargos[j][0], cargos[j][1].position)) { // Check collision with other cargos
                 radius = randFloat(3, 5);
-                temp.x = randFloat(-20, 20);
+                temp.x = randFloat(-40, 40);
                 temp.y = radius/2 - 2;
-                temp.z = randFloat(-20, 20);
+                temp.z = randFloat(-40, 40);
+                j = i;
+            }
+
+            if(checkCargosCollision(radius, temp, BASE_WIDTH, BASE_POS)) { // Check collision with base
+                radius = randFloat(3, 5);
+                temp.x = randFloat(-40, 40);
+                temp.y = radius/2 - BASE_HEIGHT/2;
+                temp.z = randFloat(-40, 40);
                 j = i;
             }
         }
