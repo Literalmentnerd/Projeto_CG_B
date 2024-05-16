@@ -833,11 +833,13 @@ function update(delta){
 
         if (keysPressed.includes('q')) {
             rotater_angle += 1;
+            if(rotater_angle > 180) rotater_angle = -179;
             rotater.rotateY(Math.PI/180);
             renderer.render(scene, cameras[currentCam]);
         }
         else if (keysPressed.includes('a')) {
             rotater_angle -= 1;
+            if(rotater_angle < -180) rotater_angle = 179;
             rotater.rotateY(-Math.PI/180);
             renderer.render(scene, cameras[currentCam]);
         }
