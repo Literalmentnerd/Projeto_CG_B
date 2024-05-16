@@ -744,10 +744,12 @@ function update(delta){
         if(rotater_angle < 0 && rotating){
             rotater_angle += 1;
             rotater.rotateY(Math.PI/180);
+            cargos[collision_with][1].rotateY(Math.PI/180);
             return;
         } else if(rotater_angle > 0 && rotating){
             rotater_angle -= 1;
             rotater.rotateY(-Math.PI/180);
+            cargos[collision_with][1].rotateY(-Math.PI/180);
             return;
         }
         rotating = false;
